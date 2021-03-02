@@ -85,21 +85,10 @@ function get_event_function_map() {
         '\mod_url\event\course_module_viewed' => 'mod_url\course_module_viewed',
         '\mod_wiki\event\course_module_viewed' => 'all\course_module_viewed',
         '\mod_workshop\event\course_module_viewed' => 'all\course_module_viewed',
-        '\totara_program\event\program_assigned' => 'totara_program\program_assigned'
+        '\totara_program\event\program_assigned' => 'totara_program\program_assigned',
+        '\local_o365_checks\event\o365_object_deleted' => 'local_cqu\o365_object_deleted',
     ];
-    if(PHPUNIT_TEST) {
-        /**
-         * In unit test, if test_adminroot_cache_reset test is run before core_event_deprecated_testcase
-         * The report_eventlist_list_generator will load course_module_instances_list_viewed abstract class
-         * which will cause the core_event_deprecated_testcase to fail
-         * (debugging already called and the debug mode is off - list_generator.php)
-         **/
-        $environmentevents = $availableevents;
-
-    } else {
-        $environmentevents = class_exists("report_eventlist_list_generator") ?
-            array_keys(\report_eventlist_list_generator::get_all_events_list(false)) : array_keys($availableevents);
-    }
+    $environmentevents = class_exists("report_eventlist_list_generator") ? array_keys(\report_eventlist_list_generator::get_all_events_list(false)) : array_keys($availableevents);
 
     return array_filter($availableevents, function($k) use ($environmentevents) {
         return in_array($k, $environmentevents);
