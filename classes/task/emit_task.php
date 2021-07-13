@@ -59,11 +59,45 @@ class emit_task extends \core\task\scheduled_task {
 
     private function extract_events($limitnum) {
         global $DB;
+
         $conditions = null;
         $sort = 'id DESC';
         $fields = '*';
         $limitfrom = 0;
-        $extractedevents = $DB->get_records('logstore_xapi_log', $conditions, $sort, $fields, $limitfrom, $limitnum);
+        $params = array();
+
+        $sql = "SELECT $fields
+                  FROM {logstore_xapi_log}";
+
+        $excludeusers = get_config('logstore_xapi', 'excludeusers');
+
+        if (!empty($excludeusers)) {
+
+            $excludeduserids = explode(',', $excludeusers);
+
+            list($conditions, $params) = $DB->get_in_or_equal($excludeduserids, SQL_PARAMS_NAMED, 'userid');
+
+            // Construct Where cause.
+            if (count($excludeduserids) === 1) {
+                $sql .= " WHERE userid !". $conditions;
+            } else {
+                $sql .= " WHERE userid NOT ". $conditions;
+            }
+
+            // Delete only excluded users log.
+            $cleanupsql = '';
+            $cleanupsql = "DELETE FROM {logstore_xapi_log}";
+            $cleanupsql .= " WHERE userid ". $conditions;
+
+            // Lets cleanup excluded users log.
+            if ($DB->execute($cleanupsql, $params)) {
+                mtrace("\nExcluded user's log has been deleted.\n");
+            }
+        }
+
+        $sql .= " ORDER BY $sort";
+
+        $extractedevents = $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
         return $extractedevents;
     }
 

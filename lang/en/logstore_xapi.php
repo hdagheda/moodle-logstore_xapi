@@ -63,3 +63,6 @@ $string['privacy:metadata:logstore_xapi_log'] = 'xAPI holding table for cron pro
 $string['privacy:metadata:logstore_xapi_log:userid'] = 'User Id of xAPI holding table for cron processing';
 $string['privacy:metadata:logstore_xapi_failed_log'] = 'xAPI holding table for failed events';
 $string['privacy:metadata:logstore_xapi_failed_log:userid'] = 'User Id of xAPI holding table for failed events';
+$string['excludeusers'] = 'Exclude users';
+$string['excludeusers_desc'] = 'Excluded users log will not be sent to LRS';
+$string['selectusers'] = 'Select users';

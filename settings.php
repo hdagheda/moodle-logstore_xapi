@@ -16,6 +16,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use logstore_xapi\admin;
+
 require_once(__DIR__ . '/src/autoload.php');
 
 if ($hassiteconfig) {
@@ -75,6 +77,11 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configcheckbox('logstore_xapi/sendresponsechoices',
        get_string('send_response_choices', 'logstore_xapi'),
        get_string('send_response_choices_desc', 'logstore_xapi'), 0));
+
+    // Exclude users.
+    $settings->add(new \logstore_xapi\admin\admin_setting_userselection('logstore_xapi/excludeusers',
+        get_string('excludeusers', 'logstore_xapi'),
+        get_string('excludeusers_desc', 'logstore_xapi'),''));
 
     // Filters.
     $settings->add(new admin_setting_heading('filters',
