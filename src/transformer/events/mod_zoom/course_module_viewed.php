@@ -14,7 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace src\transformer\events\all;
+/**
+ * xAPI transformer for mod_zoom report viewed event.
+ *
+ * @package   logstore_xapi
+ * @copyright 2021 onwards Scott Verbeek <scottverbeek@catalyst-au.net>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace src\transformer\events\mod_zoom;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -34,12 +42,7 @@ function course_module_viewed(array $config, \stdClass $event) {
                 $lang => 'viewed'
             ],
         ],
-        'object' => utils\get_activity\course_module(
-            $config,
-            $course,
-            $event->contextinstanceid,
-            'http://adlnet.gov/expapi/activities/module'
-        ),
+        'object' => utils\get_activity\zoom($config, $event->contextinstanceid),
         'timestamp' => utils\get_event_timestamp($event),
         'context' => [
             'platform' => $config['source_name'],

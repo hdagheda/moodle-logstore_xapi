@@ -14,13 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace src\transformer\events\all;
+/**
+ * xAPI transformer for mod_surveypro user template exported event.
+ *
+ * @package   logstore_xapi
+ * @copyright 2021 onwards Scott Verbeek <scottverbeek@catalyst-au.net>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-defined('MOODLE_INTERNAL') || die();
+ namespace src\transformer\events\mod_surveypro;
+
+ defined('MOODLE_INTERNAL') || die();
 
 use src\transformer\utils as utils;
 
-function course_module_viewed(array $config, \stdClass $event) {
+function usertemplate_exported(array $config, \stdClass $event) {
     $repo = $config['repo'];
     $user = $repo->read_record_by_id('user', $event->userid);
     $course = $repo->read_record_by_id('course', $event->courseid);
@@ -29,17 +37,12 @@ function course_module_viewed(array $config, \stdClass $event) {
     return [[
         'actor' => utils\get_user($config, $user),
         'verb' => [
-            'id' => 'http://id.tincanapi.com/verb/viewed',
+            'id' => 'http://id.tincanapi.com/verb/downloaded',
             'display' => [
-                $lang => 'viewed'
+                $lang => 'downloaded'
             ],
         ],
-        'object' => utils\get_activity\course_module(
-            $config,
-            $course,
-            $event->contextinstanceid,
-            'http://adlnet.gov/expapi/activities/module'
-        ),
+        'object' => utils\get_activity\surveypro_usertemplate($config, $event->objectid, $event->contextinstanceid),
         'timestamp' => utils\get_event_timestamp($event),
         'context' => [
             'platform' => $config['source_name'],

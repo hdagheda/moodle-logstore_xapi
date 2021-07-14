@@ -14,41 +14,42 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace src\transformer\events\all;
+/**
+ * xAPI transformer for mod_spa category updated event.
+ *
+ * @package   logstore_xapi
+ * @copyright 2021 onwards Scott Verbeek <scottverbeek@catalyst-au.net>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-defined('MOODLE_INTERNAL') || die();
+ namespace src\transformer\events\mod_spa;
 
-use src\transformer\utils as utils;
+ defined('MOODLE_INTERNAL') || die();
 
-function course_module_viewed(array $config, \stdClass $event) {
+ use src\transformer\utils as utils;
+
+function category_updated(array $config, \stdClass $event) {
     $repo = $config['repo'];
     $user = $repo->read_record_by_id('user', $event->userid);
-    $course = $repo->read_record_by_id('course', $event->courseid);
-    $lang = utils\get_course_lang($course);
+    $lang = $config['source_lang'];
 
     return [[
         'actor' => utils\get_user($config, $user),
         'verb' => [
-            'id' => 'http://id.tincanapi.com/verb/viewed',
+            'id' => 'http://activitystrea.ms/schema/1.0/update',
             'display' => [
-                $lang => 'viewed'
+                $lang => 'updated'
             ],
         ],
-        'object' => utils\get_activity\course_module(
-            $config,
-            $course,
-            $event->contextinstanceid,
-            'http://adlnet.gov/expapi/activities/module'
-        ),
+        'object' => utils\get_activity\spa_category($config, $event->objectid),
         'timestamp' => utils\get_event_timestamp($event),
         'context' => [
             'platform' => $config['source_name'],
             'language' => $lang,
-            'extensions' => utils\extensions\base($config, $event, $course),
+            'extensions' => utils\extensions\base($config, $event),
             'contextActivities' => [
                 'grouping' => [
                     utils\get_activity\site($config),
-                    utils\get_activity\course($config, $course),
                 ],
                 'category' => [
                     utils\get_activity\source($config),

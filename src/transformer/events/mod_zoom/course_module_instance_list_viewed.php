@@ -14,13 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace src\transformer\events\all;
+/**
+ * xAPI transformer for mod_zoom course module instance list viewed event.
+ *
+ * @package   logstore_xapi
+ * @copyright 2021 onwards Scott Verbeek <scottverbeek@catalyst-au.net>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace src\transformer\events\mod_zoom;
 
 defined('MOODLE_INTERNAL') || die();
 
 use src\transformer\utils as utils;
 
-function course_module_viewed(array $config, \stdClass $event) {
+function course_module_instance_list_viewed(array $config, \stdClass $event) {
     $repo = $config['repo'];
     $user = $repo->read_record_by_id('user', $event->userid);
     $course = $repo->read_record_by_id('course', $event->courseid);
@@ -34,12 +42,7 @@ function course_module_viewed(array $config, \stdClass $event) {
                 $lang => 'viewed'
             ],
         ],
-        'object' => utils\get_activity\course_module(
-            $config,
-            $course,
-            $event->contextinstanceid,
-            'http://adlnet.gov/expapi/activities/module'
-        ),
+        'object' => utils\get_activity\zoom_instance_list($config, $event->courseid),
         'timestamp' => utils\get_event_timestamp($event),
         'context' => [
             'platform' => $config['source_name'],
